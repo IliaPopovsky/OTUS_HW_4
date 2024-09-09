@@ -7,6 +7,7 @@
 #include <string.h>
 #include <ctype.h>
 
+char *strdup(const char *str);
 
 struct Weather {
     struct Current_condition {

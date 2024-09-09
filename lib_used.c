@@ -1,4 +1,3 @@
-#if 1
 #include "parser.h"
 #include <assert.h>
 #include <errno.h>
@@ -62,7 +61,6 @@ static void callback(enum NanoJSONCError error, const char *const key, const cha
         **weather = (struct Weather){0}; // Initialize all members to 0
     }
 
-    //if (strcmp(parentKey, "data[current_condition]") == 0) {
     if (strcmp(parentKey, "data[current_condition][0]") == 0) {
         if ((*weather)->current_condition == NULL) {
             (*weather)->current_condition = malloc(sizeof(struct Current_condition));
@@ -145,114 +143,12 @@ void weather_free(struct Weather **weather) {
 
 int main(int argc, char *argv[])
 {
-    if(argc < 2)
+    if(argc != 2)
     {
-       char gorod[] = "Moscow";
-       char pogoda[] = "curl -sLo file8.txt https://wttr.in/Moscow?format=j1";
-       char pogoda_Paris[] = "curl -sLo file9.txt https://wttr.in/Paris?format=j1";
-       char enter_gorod[] = "curl -sLo file10.txt https://wttr.in/London?format=j1";
-       char *moscow[] = {"curl", "-sLo Moscow.json https://wttr.in/Moscow?format=j1", 0};
-       char moscow1[] = "curl -sLo Moscow.json https://wttr.in/Moscow?format=j1";
-       system("help");
-       system("cd");
-       //system("CHCP 1251");
-       system("CHCP ");
-
-
-       //system("cmd");
-       //system("help cd");
-       //system("CMD");
-       system("curl --help");
-       system("curl -OL https://wttr.in/Moscow?format=j1");
-       system("curl -sLo file1.txt https://wttr.in/Moscow?format=j1");
-       system("curl -sLo file2.txt https://wttr.in/city?format=j1");
-       system("curl -sLo file3.txt https://wttr.in/ogorod?format=j1");
-       system("curl -sLo file4.txt https://wttr.in/54?format=j1");
-       system("curl -sLo file5.txt https://wttr.in/200?format=j1");
-       system("curl -sLo file6.txt https://wttr.in/params=gorod?format=j1");
-       system("curl -sLo file7.txt https://wttr.in/params={gorod}?format=j1");
-       //system("pause");
-       //_wsystem("");
-       system(pogoda);
-       system(pogoda_Paris);
-       system(enter_gorod);
-       //system(moscow);
-       char *args[] = {"echo" , "Hello, Linux!", 0};
-       char *args1[] = {"curl", "-sLo", "file11.txt", "https://wttr.in/Moscow?format=j1", 0};
-       char *args2[] = {"curl", "-sLo file13.txt https://wttr.in/Paris?format=j1", 0};
-       //execvp("echo", args);
-       //printf("execvp() failed. Error: %s\n", strerror(errno));
-       system(moscow1);
-       //execvp("curl -sLo", args1);
-       //printf("execvp() failed. Error: %s\n", strerror(errno));
-       //execvp("C:\Windows\System32\curl.exe", args1);
-       //printf("execvp() failed. Error: %s\n", strerror(errno));
-      // execvp("curl", args2);
-       //printf("execvp() failed. Error: %s\n", strerror(errno));
-       //execvp("curl", args2);
-       //printf("execvp() failed. Error: %s\n", strerror(errno));
-      // execvp("curl", args2);
-       //printf("execvp() failed. Error: %s\n", strerror(errno));
-       puts("\n\n");
-       //execvp("curl", moscow);
-       //printf("execvp() failed. Error: %s\n", strerror(errno));
-       //system("curl -OL https://docs.google.com/spreadsheets/d/1gVudHOA1mDkjLiRLobs95OJmBOzBQrHj/edit?gid=922040824#gid=922040824");
-       //system("curl -sLo abon.xlsx https://docs.google.com/spreadsheets/d/1gVudHOA1mDkjLiRLobs95OJmBOzBQrHj/edit?gid=922040824#gid=922040824");
-
-        //FILE *file = fopen("example3.json", "rb");
-    FILE *file = fopen("Moscow.json", "rb");
-    //FILE *file = fopen("Moscow1.json", "rb");
-    if (file == NULL) {
-        fprintf(stderr, "Error: %d: %s\n", errno, strerror(errno));
-        return errno;
+       printf("Only %d arguments have been entered, but there should be 1\n", argc - 1);
+       goto end;
     }
-
-    if (fseek(file, 0, SEEK_END) != 0) {
-        perror("Error seeking file");
-        fclose(file);
-        return errno;
-    }
-    long len = ftell(file);
-    rewind(file);
-
-    char *buffer = (char *) malloc(len + 1);
-    if (buffer == NULL) {
-        fclose(file);
-        perror("Error allocating memory");
-        return ENOMEM;
-    }
-
-    size_t bytes_read = fread(buffer, 1, len, file);
-    if (bytes_read != (size_t) len) {
-        if (feof(file)) {
-            perror("Error: end of file reached before reading expected bytes.");
-            fclose(file);
-            free(buffer);
-            return EIO;
-        } else if (ferror(file)) {
-            perror("Error reading the file");
-            fclose(file);
-            free(buffer);
-            return errno;
-        }
-    }
-    buffer[len] = '\0';
-    fclose(file);
-
-    struct Weather *weather = NULL;
-    nanojsonc_parse_object(buffer, "data", &weather, callback);
-
-
-
-    printf("Area name: %s\n", weather->nearest_area->areaName->value);
-    printf("Region: %s\n", weather->nearest_area->region->value);
-    printf("Date time weather measurements:%s\n", weather->current_condition->localObsDateTime);
-    printf("Weather: %s, air temperature %sC, wind dir %s %s, wind speed %sKmph\n", weather->current_condition->weatherDesc->value, weather->current_condition->temp_C,
-           weather->current_condition->winddir16Point, weather->current_condition->winddirDegree, weather->current_condition->windspeedKmph);
-    weather_free(&weather);
-    free(buffer);
-    }
-    if(argc >= 2)
+    if(argc == 2)
     {
        char city[100] = {0};
        char file_city[100] = {0};
@@ -261,6 +157,7 @@ int main(int argc, char *argv[])
        if(system(city) != 0)
        {
           printf("Error. Failed to establish network connection!\n");
+          exit(1);
        }
        FILE *file = fopen(file_city, "rb");
 
@@ -305,7 +202,6 @@ int main(int argc, char *argv[])
       nanojsonc_parse_object(buffer, "data", &weather, callback);
 
       argv[1][0] = toupper(argv[1][0]);
-      printf("argv[1] = %s\n", argv[1]);
       if(strstr(weather->nearest_area->region->value, argv[1]) == NULL && strstr(weather->nearest_area->areaName->value, argv[1]) == NULL)
       {
           printf("Incorrect city name entered.\n");
@@ -319,8 +215,9 @@ int main(int argc, char *argv[])
       weather_free(&weather);
       free(buffer);
     }
+    end:
     printf("This program exits!\n");
     return 0;
 }
-#endif
+
 

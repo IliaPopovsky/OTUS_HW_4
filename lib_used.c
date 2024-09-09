@@ -8,6 +8,7 @@
 #include <string.h>
 #include <ctype.h>
 
+
 struct Weather {
     struct Current_condition {
         char *FeelsLikeC;
@@ -98,11 +99,19 @@ static void callback(enum NanoJSONCError error, const char *const key, const cha
     if (strcmp(parentKey, "data[nearest_area][0]") == 0) {
         if ((*weather)->nearest_area == NULL) {
             (*weather)->nearest_area = malloc(sizeof(struct Nearest_area));
+            if((*weather)->nearest_area == NULL)
+                printf("Failed to allocate memory.\n");
             *(*weather)->nearest_area = (struct Nearest_area){0};
         }
     }
 
     if (strcmp(parentKey, "data[nearest_area][0][areaName][0]") == 0) {
+        if ((*weather)->nearest_area == NULL) {
+            (*weather)->nearest_area = malloc(sizeof(struct Nearest_area));
+            if((*weather)->nearest_area == NULL)
+                printf("Failed to allocate memory.\n");
+            *(*weather)->nearest_area = (struct Nearest_area){0};
+        }
         if ((*weather)->nearest_area->areaName == NULL) {
             (*weather)->nearest_area->areaName = malloc(sizeof(struct AreaName));
             *(*weather)->nearest_area->areaName = (struct AreaName){0};
@@ -124,10 +133,8 @@ void weather_free(struct Weather **weather) {
     (*weather)->current_condition->weatherDesc = NULL;
     free((*weather)->current_condition);
     (*weather)->current_condition = NULL;
-    /*
     free((*weather)->nearest_area->areaName);
     (*weather)->nearest_area->areaName = NULL;
-    */
     free((*weather)->nearest_area->region);
     (*weather)->nearest_area->region = NULL;
     free((*weather)->nearest_area);
@@ -236,6 +243,8 @@ int main(int argc, char *argv[])
     nanojsonc_parse_object(buffer, "data", &weather, callback);
 
 
+
+    printf("Area name: %s\n", weather->nearest_area->areaName->value);
     printf("Region: %s\n", weather->nearest_area->region->value);
     printf("Date time weather measurements:%s\n", weather->current_condition->localObsDateTime);
     printf("Weather: %s, air temperature %sC, wind dir %s %s, wind speed %sKmph\n", weather->current_condition->weatherDesc->value, weather->current_condition->temp_C,
@@ -296,12 +305,13 @@ int main(int argc, char *argv[])
       nanojsonc_parse_object(buffer, "data", &weather, callback);
 
       argv[1][0] = toupper(argv[1][0]);
-      if(strstr(weather->nearest_area->region->value, argv[1]) == NULL)
+      printf("argv[1] = %s\n", argv[1]);
+      if(strstr(weather->nearest_area->region->value, argv[1]) == NULL && strstr(weather->nearest_area->areaName->value, argv[1]) == NULL)
       {
           printf("Incorrect city name entered.\n");
           exit(1);
       }
-
+      printf("Area name: %s\n", weather->nearest_area->areaName->value);
       printf("Region: %s\n", weather->nearest_area->region->value);
       printf("Date time weather measurements:%s\n", weather->current_condition->localObsDateTime);
       printf("Weather: %s, air temperature %sC, wind dir %s %s, wind speed %sKmph\n", weather->current_condition->weatherDesc->value, weather->current_condition->temp_C,
